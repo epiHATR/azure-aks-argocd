@@ -1,5 +1,7 @@
+<a href="https://www.buymeacoffee.com/hidetran"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=hidetran&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+
 # Introduction
-This is Terraform template which creates an AKS cluster with ArgoCD installed and accessible though a public IP address
+This is Terraform template which creates an AKS cluster with ArgoCD installed and accessible though a public IP domain name label such as cluster-name.northeurope.cloudapps.azure.com
 
 # Features
 This Terraform template will provision following resource on Azure:

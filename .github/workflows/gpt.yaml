@@ -1,0 +1,50 @@
+name: Create Azure VM
+
+on:
+  workflow_dispatch:
+    inputs:
+      vm_name:
+        description: The name of the virtual machine
+        required: true
+      resource_group_name:
+        description: The name of the resource group to create or use for the virtual machine
+        required: true
+      location:
+        description: The location where the virtual machine will be created
+        required: true
+      vm_size:
+        description: The size of the virtual machine
+        required: true
+
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+jobs:
+  create_vm:
+    name: Create VM
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Azure CLI
+      uses: azure/setup-azure-cli@v1
+      with:
+        azure-cli-version: latest
+
+    - name: Login to Azure
+      run: |
+        az login --service-principal -u ${{ env.AZURE_CLIENT_ID }} -p ${{ env.AZURE_CLIENT_SECRET }} --tenant ${{ env.AZURE_TENANT_ID }}
+        az account set --subscription ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Create Resource Group
+      run: |
+        az group create --name ${{ inputs.resource_group_name }} --location ${{ inputs.location }}
+
+    - name: Create VM
+      run: |
+        az vm create --resource-group ${{ inputs.resource_group_name }} --name ${{ inputs.vm_name }} --location ${{ inputs.location }} --size ${{ inputs.vm_size }} --image UbuntuLTS --generate-ssh-keys

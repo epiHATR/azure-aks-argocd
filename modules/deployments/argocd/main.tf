@@ -23,7 +23,7 @@ resource "helm_release" "argocd" {
   namespace        = var.namespace
   create_namespace = true
 
-  values = concat([yamlencode(local.values)])
+  values = [yamlencode(local.values)]
 
   set {
     name  = "server.extraArgs"

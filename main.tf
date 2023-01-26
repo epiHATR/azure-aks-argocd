@@ -46,12 +46,18 @@ locals {
   cluster_appgateway_subnet_name = "${var.aks_name}-appgw"
   cluster_appgw_address_prefix   = var.cluster_appgw_address_prefix
   frontend_ip_configuration_name = "default"
+  backend_http_setting_name      = "default"
+  backend_address_pool_name      = "default"
+  frontend_port_name             = "default"
+  http_listener_name             = "default"
+  request_routing_rule_name      = "default"
 
   #aks
   aks_name            = var.aks_name
   aks_version         = var.aks_version
   cluster_aks_rg_name = "${var.aks_name}-k8s-rg"
   dns_prefix          = var.aks_name
+  node_pool           = "default"
 
   #argocd
   argocd_admin_password = var.argocd_admin_password
@@ -152,7 +158,7 @@ resource "azurerm_application_gateway" "app_gateway" {
   }
 
   backend_http_settings {
-    name                  = "default"
+    name                  = local.backend_http_setting_name
     cookie_based_affinity = "Enabled"
     path                  = "/"
     port                  = 80
@@ -161,27 +167,27 @@ resource "azurerm_application_gateway" "app_gateway" {
   }
 
   backend_address_pool {
-    name = "default"
+    name = local.backend_address_pool_name
   }
 
   frontend_port {
-    name = "default"
+    name = local.frontend_port_name
     port = 80
   }
 
   http_listener {
-    name                           = "default"
-    frontend_ip_configuration_name = "default"
-    frontend_port_name             = "default"
+    name                           = local.http_listener_name
+    frontend_ip_configuration_name = local.frontend_ip_configuration_name
+    frontend_port_name             = local.frontend_port_name
     protocol                       = "Http"
   }
 
   request_routing_rule {
-    name                       = "default"
+    name                       = local.request_routing_rule_name
     rule_type                  = "Basic"
-    http_listener_name         = "default"
-    backend_address_pool_name  = "default"
-    backend_http_settings_name = "default"
+    http_listener_name         = local.http_listener_name
+    backend_address_pool_name  = local.backend_address_pool_name
+    backend_http_settings_name = local.backend_http_setting_name
     priority                   = 100
   }
 
@@ -224,7 +230,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   default_node_pool {
-    name           = "default"
+    name           = local.node_pool
     node_count     = 3
     vm_size        = "Standard_D2_v2"
     os_sku         = "Ubuntu"
